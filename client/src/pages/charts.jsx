@@ -14,21 +14,21 @@ const formatDataForPieChart = (deliveries) => {
     if (!deliveries) return [];
 
     const statusCounts = {
+        enattente: 0,
+        endepot: 0,
         encours: 0,
-        livré: 0,
-        enretour: 0,
     };
 
     deliveries.forEach((delivery) => {
-        if (delivery.status === 'EnCours') statusCounts.encours++;
-        else if (delivery.status === 'Livré') statusCounts.livré++;
-        else if (delivery.status === 'EnRetour') statusCounts.enretour++;
+        if (delivery.status === 'EnAttente') statusCounts.enattente++;
+        else if (delivery.status === 'EnDepot') statusCounts.endepot++;
+        else if (delivery.status === 'EnCours') statusCounts.encours++;
     });
 
     return [
-        { type: 'EnCours', value: statusCounts.encours },
-        { type: 'Livré', value: statusCounts.livré }, // Correction d'affichage
-        { type: 'EnRetour', value: statusCounts.enretour },
+        { type: 'EnAttente', value: statusCounts.enattente },
+        { type: 'EnDepot', value: statusCounts.endepot }, // Correction d'affichage
+        { type: 'EnRetour', value: statusCounts.encours },
     ];
 };
 

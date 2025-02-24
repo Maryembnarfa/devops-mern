@@ -285,7 +285,7 @@ const Users = () => {
                         <Select>
                             <Select.Option value="admin">EXPEDITEUR</Select.Option>
                             <Select.Option value="user">ADMIN</Select.Option>
-                            <Select.Option value="user">USER</Select.Option>
+                            <Select.Option value="user">LIVREUR</Select.Option>
                         </Select>
                     </Form.Item>
 
@@ -321,7 +321,7 @@ const Users = () => {
                         <Select>
                             <Select.Option value="admin">EXPEDITEUR</Select.Option>
                             <Select.Option value="user">ADMIN</Select.Option>
-                            <Select.Option value="user">USER</Select.Option>
+                            <Select.Option value="user">LIVREUR</Select.Option>
                         </Select>
                     </Form.Item>
 

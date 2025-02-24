@@ -3,19 +3,19 @@ import { Modal, Form, Input, message } from "antd";
 import React from "react";
 import { axiosInstance } from "../../lib/axios";
 
-export default function AddDilevery({ open, setOpen }) {
+export default function AddVehicle({ open, setOpen }) {
     const [form] = Form.useForm();
     const queryClient = useQueryClient();
 
     const { mutate, isPending } = useMutation({
         mutationFn: async (values) => {
-            const response = await axiosInstance.post("/delivry", values)
+            const response = await axiosInstance.post("/vehicles", values)
             return response.data
         },
         onSuccess: (data) => {
             message.success("success")
             setOpen(false)
-            queryClient.invalidateQueries({ queryKey: ["delivery"] })
+            queryClient.invalidateQueries({ queryKey: ["vehicle"] })
         },
         onError: (err) => {
             console.log(err)
@@ -36,23 +36,10 @@ export default function AddDilevery({ open, setOpen }) {
             }}
             onOk={() => form.validateFields().then((values) => handleSubmit(values)).catch(() => console.log("error"))}
         >
-            <Form form={form} name="add delivery">
-                <Form.Item label="Client" name="client_name" rules={[{ required: true }]}>
+            <Form form={form} name="add vehicle">
+                <Form.Item label="Serie" name="serie" rules={[{ required: true }]}>
                     <Input />
                 </Form.Item>
-                <Form.Item label="Adresse" name="delivery_address" rules={[{ required: true }]}>
-                    <Input />
-                </Form.Item>
-                <Form.Item label="Gouvernement" name="government" rules={[{ required: true }]}>
-                    <Input />
-                </Form.Item>
-                <Form.Item label="Phone" name="phone1" rules={[{ required: true }]}>
-                    <Input />
-                </Form.Item>
-                <Form.Item label="Street" name="street" rules={[{ required: true }]}>
-                    <Input />
-                </Form.Item>
-
 
 
             </Form>

@@ -8,6 +8,9 @@ const DelivryModel = new Schema(
       ref: "users",
       required: true, // Champ obligatoire
     },
+    code: {
+      type: String,
+    },
     client_name: {
       type: String,
       required: true, // Ajouté comme obligatoire
@@ -30,8 +33,8 @@ const DelivryModel = new Schema(
     },
     status: {
       type: String,
-      enum: ['EnCours', 'Livré', 'EnRetour'],
-      default: 'EnCours',
+      enum: ['EnAttente', 'EnDepot', 'EnCours', 'Livré', 'EnRetour'],
+      default: 'EnAttente',
     },
   },
   {

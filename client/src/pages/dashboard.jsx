@@ -5,13 +5,18 @@ import {
     MenuUnfoldOutlined,
     UserOutlined,
     DashboardOutlined,
-    CarOutlined
+    CarOutlined,
+    ShoppingCartOutlined,
+    FileDoneOutlined
 } from '@ant-design/icons';
 import { Layout, Menu, Button, theme } from 'antd';
 import Users from '../pages/users';
 import Delivery from './dilevery/listDilevery';
 import deliveryImage from '../assets/images/delivery.png';
 import DeliveryPieChart from '../pages/charts';
+import Vehicle from './vehicle/listVehicle';
+import RunSheet from './runSheet/listRunSheet';
+import TrackDelivery from './suiviCommande';
 const { Header, Sider, Content } = Layout;
 
 const Dashboard = () => {
@@ -27,7 +32,11 @@ const Dashboard = () => {
     const menuComponents = {
         '1': <DeliveryPieChart />,
         '2': <Users />,
-        '3': <Delivery />
+        '3': <Delivery />,
+        '4': <Vehicle />,
+        '5': <RunSheet />,
+        '6': <TrackDelivery />,
+
     };
 
     // Menu items configuration
@@ -44,9 +53,24 @@ const Dashboard = () => {
         },
         {
             key: '3',
-            icon: <CarOutlined />,
+            icon: <ShoppingCartOutlined />,  // Icône de livraison
             label: 'Delivery'
         },
+        {
+            key: '4',
+            icon: <CarOutlined />,  // Garde l'icône de voiture pour les véhicules
+            label: 'Vehicle'
+        },
+        {
+            key: '5',
+            icon: <FileDoneOutlined />,  // Icône de document/feuille pour RunSheet
+            label: 'RunSheet'
+        },
+        {
+            key: '6',
+            icon: <FileDoneOutlined />,  // Icône de document/feuille pour RunSheet
+            label: 'SuiviCommande'
+        }
     ];
 
     // Handle menu item click

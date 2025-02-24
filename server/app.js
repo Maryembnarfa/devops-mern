@@ -8,6 +8,9 @@ const cors = require('cors');
 const routerusers = require('./routes/users.route');
 const routerlogin = require('./routes/login.route');
 const routerdelivry = require('./routes/delivry.route');
+const routervehicle = require('./routes/vehicle.route');
+const routerrunsheet = require('./routes/runSheet.route');
+
 const passport = require('passport');
 
 var app = express();
@@ -42,5 +45,7 @@ app.options('*', cors()); // Répond aux requêtes OPTIONS pour toutes les route
 app.use('/api', routerusers);
 app.use('/api', routerlogin);
 app.use('/api', routerdelivry);
+app.use('/api', routervehicle);
+app.use('/api', routerrunsheet);
 
 module.exports = app;

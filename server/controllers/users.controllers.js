@@ -12,7 +12,7 @@ const AddUsers = async (req, res) => {
     }
 
     // Vérifier si l'email existe déjà
-    const exist = await UsersModel.findOne({ email: req.body.email });
+    const exist = await UsersModel.findOne({ username: req.body.username });
     if (exist) {
       return res.status(400).json({ error: 'User Exist' });
     } else {

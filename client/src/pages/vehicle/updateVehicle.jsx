@@ -3,15 +3,15 @@ import { Form, Input, Modal, Button, message } from "antd";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../../lib/axios";
 
-export default function UpdateDelivery({ openUpdate, setOpenUpdate, id }) {
+export default function UpdateVehicle({ openUpdate, setOpenUpdate, id }) {
     const [form] = Form.useForm();
     const queryClient = useQueryClient();
 
     // Requête pour récupérer les données du produit
     const { data, isLoading } = useQuery({
-        queryKey: ["delivry", id],
+        queryKey: ["vehicle", id],
         queryFn: async () => {
-            const response = await axiosInstance.get(`/delivry/${id}`);
+            const response = await axiosInstance.get(`/vehicle/${id}`);
             form.setFieldsValue(response.data); // Pré-remplir le formulaire
             return response.data;
         },
@@ -21,15 +21,15 @@ export default function UpdateDelivery({ openUpdate, setOpenUpdate, id }) {
     // Mutation pour mettre à jour les données
     const mutation = useMutation({
         mutationFn: async (values) => {
-            return await axiosInstance.put(`/delivry/${id}`, values);
+            return await axiosInstance.put(`/vehicle/${id}`, values);
         },
         onSuccess: () => {
-            message.success("Livraison mis à jour avec succès !");
-            queryClient.invalidateQueries(["delivry"]); // Invalider le cache pour recharger les données
+            message.success("vehicle mis à jour avec succès !");
+            queryClient.invalidateQueries(["vehicle"]); // Invalider le cache pour recharger les données
             setOpenUpdate(false); // Fermer le modal
         },
         onError: () => {
-            message.error("Échec de la mise à jour du livraison !");
+            message.error("Échec de la mise à jour du vehicle !");
         },
     });
 
@@ -55,23 +55,10 @@ export default function UpdateDelivery({ openUpdate, setOpenUpdate, id }) {
         >
             <Form
                 form={form}
-                name="update delivery"
+                name="update vehicle"
                 onFinish={handleUpdate} // Déclencher handleSubmit à la soumission
             >
-
-                <Form.Item label="Client" name="client_name" rules={[{ required: true }]}>
-                    <Input />
-                </Form.Item>
-                <Form.Item label="Adresse" name="delivery_address" rules={[{ required: true }]}>
-                    <Input />
-                </Form.Item>
-                <Form.Item label="Gouvernement" name="government" rules={[{ required: true }]}>
-                    <Input />
-                </Form.Item>
-                <Form.Item label="Phone" name="phone1" rules={[{ required: true }]}>
-                    <Input />
-                </Form.Item>
-                <Form.Item label="Strret" name="street" rules={[{ required: true }]}>
+                <Form.Item label="Serie" name="serie" rules={[{ required: true }]}>
                     <Input />
                 </Form.Item>
 
