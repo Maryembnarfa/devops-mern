@@ -18,13 +18,13 @@ const AddDelivry = async (req, res) => {
 
             if (lastDelivery && lastDelivery.code) {
                 // Extraire le numéro de séquence du dernier code
-                const lastSequenceNumber = parseInt(lastDelivery.code.slice(-1), 10);
+                const lastCode = lastDelivery.code; // Ex: "25000010"
+                const lastSequenceNumber = parseInt(lastCode.slice(-2), 10); // Extraire les 2 derniers chiffres
                 sequenceNumber = lastSequenceNumber + 1; // Incrémenter le numéro de séquence
             }
 
-            // Générer le nouveau code de livraison
-            const code = `${year}0000${sequenceNumber}`; // Ex: "25000001"
-
+            // Générer le nouveau code de livraison avec 4 zéros fixes et 2 chiffres pour le numéro de séquence
+            const code = `${year}0000${String(sequenceNumber).padStart(2, '0')}`; // Ex: "25000001", "25000010", "25000011", etc.
             //houni 9bal mnb3th lbody bch nzid champ user bch 
             // ye5ou id elli teb3ath ml passwort
             req.body.code = code;
@@ -96,12 +96,12 @@ const UpdateDelivryStatus = async (req, res) => {
 
 }
 const UpdateDelivryStatusAttente = async (req, res) => {
-    const { _id } = req.body; // Liste des IDs des livraisons sélectionnées
+    const { _id } = req.body; // Liste des ID des livraisons sélectionnées
 
     try {
         // Mettre à jour le statut des livraisons sélectionnées si elles sont en "EnAttente"
         const result = await DelivryModel.updateMany(
-            { _id: { $in: _id }, status: "EnAttente" }, // Filtre : IDs et statut "EnAttente"
+            { _id: { $in: _id }, status: "EnAttente" }, // Filtre : ID et statut "EnAttente"
             { $set: { status: "EnDepot" } } // Mise à jour : statut "EnDepot"
         );
 

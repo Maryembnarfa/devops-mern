@@ -17,18 +17,32 @@ const formatDataForPieChart = (deliveries) => {
         enattente: 0,
         endepot: 0,
         encours: 0,
+        retoure: 0,
+        retourd: 0,
+        livré: 0,
     };
 
     deliveries.forEach((delivery) => {
         if (delivery.status === 'EnAttente') statusCounts.enattente++;
         else if (delivery.status === 'EnDepot') statusCounts.endepot++;
         else if (delivery.status === 'EnCours') statusCounts.encours++;
+        else if (delivery.status === 'RetourE') statusCounts.retoure++;
+        else if (delivery.status === 'RetourD') statusCounts.retourd++;
+        else if (delivery.status === 'Livré') statusCounts.livré++;
+
+
     });
 
     return [
         { type: 'EnAttente', value: statusCounts.enattente },
         { type: 'EnDepot', value: statusCounts.endepot }, // Correction d'affichage
-        { type: 'EnRetour', value: statusCounts.encours },
+        { type: 'EnCours', value: statusCounts.encours },
+        { type: 'RetourE', value: statusCounts.retoure },
+
+        { type: 'RetourD', value: statusCounts.retourd },
+
+        { type: 'Livré', value: statusCounts.livré },
+
     ];
 };
 
@@ -50,7 +64,7 @@ const DeliveryPieChart = () => {
         data: chartData,
         angleField: 'value',
         colorField: 'type',
-        radius: 0.8,
+        radius: 0.6,
         label: {
             text: (d) => `${d.type}\n ${d.value}`,
             position: 'spider',

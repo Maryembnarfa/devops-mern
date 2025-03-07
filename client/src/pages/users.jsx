@@ -103,11 +103,11 @@ const Users = () => {
         }
     };
     // Ajoutez cette fonction dans votre composant Users
-    const checkEmailExists = async (email) => {
+    const checkEmailExists = async (username) => {
         const token = localStorage.getItem('jwt');
         try {
             // Vérifier dans la liste des utilisateurs existants
-            const existingUser = users.find(user => user.email.toLowerCase() === email.toLowerCase());
+            const existingUser = users.find(user => user.username.toLowerCase() === username.toLowerCase());
             return !!existingUser;
         } catch (error) {
             console.error("Error checking email:", error);
@@ -145,7 +145,7 @@ const Users = () => {
             content: (
                 <div>
                     <p><strong>Name:</strong> {user.name}</p>
-                    <p><strong>Email:</strong> {user.email}</p>
+                    <p><strong>UserName:</strong> {user.username}</p>
                     <p><strong>Role:</strong> {user.role}</p>
                 </div>
             ),
@@ -171,9 +171,9 @@ const Users = () => {
             },
         },
         {
-            title: 'Email',
-            dataIndex: 'email',
-            key: 'email',
+            title: 'UserName',
+            dataIndex: 'username',
+            key: 'username',
         },
         {
             title: 'Rôle',
@@ -241,6 +241,7 @@ const Users = () => {
                 rowKey="_id"
                 loading={isLoading}
                 error={isError ? error.message : null}
+                pagination={{ pageSize: 5 }}
             />
 
             {/* Modal pour ajouter un utilisateur */}
@@ -256,17 +257,20 @@ const Users = () => {
                     </Form.Item>
 
                     <Form.Item
-                        label="Email"
-                        name="email"
+                        label="Email or Phone"
+                        name="username"
                         rules={[
-                            { required: true, message: 'Please input the email!' },
-                            { type: 'email', message: 'Please enter a valid email!' },
+                            { required: true, message: "Please enter your email or phone number" },
+                            {
+                                pattern: /^([^\s@]+@[^\s@]+\.[^\s@]+|\d{8})$/,
+                                message: "Please enter a valid email or an 8-digit phone number"
+                            },
                             {
                                 validator: async (_, value) => {
                                     if (value) {
                                         const exists = await checkEmailExists(value);
                                         if (exists) {
-                                            throw new Error('This email is already registered');
+                                            throw new Error('This username is already registered');
                                         }
                                     }
                                     return Promise.resolve();
@@ -283,9 +287,9 @@ const Users = () => {
 
                     <Form.Item label="Role" name="role" rules={[{ required: true, message: 'Please select a role!' }]}>
                         <Select>
-                            <Select.Option value="admin">EXPEDITEUR</Select.Option>
-                            <Select.Option value="user">ADMIN</Select.Option>
-                            <Select.Option value="user">LIVREUR</Select.Option>
+                            <Select.Option value="EXPEDITEUR">EXPEDITEUR</Select.Option>
+                            <Select.Option value="ADMIN">ADMIN</Select.Option>
+                            <Select.Option value="LIVREUR">LIVREUR</Select.Option>
                         </Select>
                     </Form.Item>
 
@@ -309,7 +313,15 @@ const Users = () => {
                         <Input />
                     </Form.Item>
 
-                    <Form.Item label="Email" name="email" rules={[{ required: true, message: 'Please input the email!' }, { type: 'email', message: 'Please enter a valid email!' }]}>
+                    <Form.Item label="UserName" name="username" rules={[
+                        { required: true, message: "Please enter your email or phone number" },
+                        {
+                            pattern: /^([^\s@]+@[^\s@]+\.[^\s@]+|\d{8})$/,
+                            message: "Please enter a valid email or an 8-digit phone number"
+                        },
+
+                    ]}
+                    >
                         <Input />
                     </Form.Item>
 
@@ -319,9 +331,9 @@ const Users = () => {
 
                     <Form.Item label="Role" name="role" rules={[{ required: true, message: 'Please select a role!' }]}>
                         <Select>
-                            <Select.Option value="admin">EXPEDITEUR</Select.Option>
-                            <Select.Option value="user">ADMIN</Select.Option>
-                            <Select.Option value="user">LIVREUR</Select.Option>
+                            <Select.Option value="EXPEDITEUR">EXPEDITEUR</Select.Option>
+                            <Select.Option value="ADMIN">ADMIN</Select.Option>
+                            <Select.Option value="LIVREUR">LIVREUR</Select.Option>
                         </Select>
                     </Form.Item>
 

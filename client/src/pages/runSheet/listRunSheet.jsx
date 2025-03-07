@@ -1,18 +1,20 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import React, { useState } from 'react';
 import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
-import { Table, message, Button, Modal } from 'antd';
+import { Select, Table, message, Button, Modal } from 'antd';
 import { axiosInstance } from "../../lib/axios";
 import AddRunSheet from "./addRunSheet";
-
+const { Option } = Select;
 
 
 const RunSheet = () => {
     const [open, setOpen] = useState(false);
     const [openView, setOpenView] = useState(false);
-
+    const [openRetourD, setOpenRetourD] = useState(false); // État pour la modal RetourD
+    const [openLivré, setOpenLivré] = useState(false); // État pour la modal Valider
     const [id, setId] = useState();
     const [selectedRunSheet, setSelectedRunSheet] = useState(null);
+    const [selectedLivraisons, setSelectedLivraisons] = useState([]);
     const queryClient = useQueryClient();
 
     // Récupérer les données des vehicles
@@ -26,6 +28,7 @@ const RunSheet = () => {
             message.error('`Erreur lors du chargement des runSheet: ${error.message}`')
         },
     });
+
     // Mutation pour supprimer une vehicule
     const { mutate: deleteRunSheet } = useMutation({
         mutationFn: async (id) => {
@@ -58,6 +61,8 @@ const RunSheet = () => {
         setSelectedRunSheet(record); // Stocker les données de la livraison sélectionnée
         setOpenView(true); // Ouvrir la modal
     };
+
+
     // Récupérer les données des véhicules
 
     const { data: vehicles, isLoading: isVehiclesLoading } = useQuery({
@@ -82,8 +87,8 @@ const RunSheet = () => {
             message.error(`Erreur lors du chargement des livraisons: ${error.message}`);
         },
     });
-    // Filtrer les livraisons avec le statut "EnAttente"
-    const livraisonsEnAttente = livraisons?.filter(livraison => livraison.status === "EnDepot") || [];
+    // Filtrer les livraisons avec le statut "EnDepot"
+    const livraisonsEnDepot = livraisons?.filter(livraison => livraison.status === "EnDepot") || [];
     // Récupérer les données des users
     const { data: users, isLoading: isUsersLoading } = useQuery({
         queryKey: ["users"],
@@ -101,7 +106,43 @@ const RunSheet = () => {
     const livreurs = users?.filter(user => user.role === "LIVREUR") || [];
 
 
+
+    // Fonction pour afficher la modal RetourD
+    const handleRetourD = (record) => {
+        setSelectedRunSheet(record); // Stocker les données de la RunSheet sélectionnée
+        setOpenRetourD(true); // Ouvrir la modal RetourD
+    };
+
+    const handleValider = (record) => {
+        setSelectedRunSheet(record); // Stocker les données de la RunSheet sélectionnée
+        setOpenLivré(true); // Ouvrir la modal Valider
+    };
+
+    // Fonction pour mettre à jour le statut des livraisons sélectionnées
+    const handleUpdateStatus = async (status) => {
+        try {
+            // Envoyer une requête pour mettre à jour le statut des livraisons sélectionnées
+            await axiosInstance.put(`/runSheet/${selectedRunSheet._id}/updateStatus`, {
+                livraisons: selectedLivraisons, // Les livraisons sélectionnées
+                status: status // Nouveau statut (RetourE ou RetourD)
+            });
+
+            message.success(`Statut des livraisons mis à jour avec succès (${status})`);
+
+            setOpenRetourD(false); // Fermer la modal RetourD
+            setOpenLivré(false);// // Fermer la modal Valider
+            queryClient.invalidateQueries(["runSheet"]); // Rafraîchir les données
+        } catch (error) {
+            message.error(`Erreur lors de la mise à jour du statut: ${error.message}`);
+        }
+    };
+
     const columns = [
+        {
+            title: 'Code',
+            dataIndex: 'code',
+            key: 'code',
+        },
         {
             title: 'Serie',
             dataIndex: 'serie',
@@ -125,6 +166,14 @@ const RunSheet = () => {
             key: 'actions',
             render: (text, record) => (
                 <div style={{ display: 'flex', gap: '10px' }}>
+                    <Button style={{ backgroundColor: '#ffbb96', borderColor: '#ffbb96', color: 'black' }}
+                        onClick={() => handleRetourD(record)}>
+                        RetourD
+                    </Button>
+                    <Button style={{ backgroundColor: '#d3adf7', borderColor: '#d3adf7', color: 'black' }}
+                        onClick={() => handleValider(record)}>
+                        Valider
+                    </Button>
                     <EyeOutlined
                         style={{ fontSize: '18px', cursor: 'pointer' }}
                         onClick={() => handleViewRunSheet(record)} // Fonction d'affichage
@@ -165,9 +214,10 @@ const RunSheet = () => {
                 columns={columns}
                 rowKey="_id"
                 loading={isLoading}
+                pagination={{ pageSize: 5 }}
             />
 
-            <AddRunSheet open={open} setOpen={setOpen} vehicles={vehicles} livreurs={livreurs} livraisons={livraisonsEnAttente} />
+            <AddRunSheet open={open} setOpen={setOpen} vehicles={vehicles} livreurs={livreurs} livraisons={livraisonsEnDepot} />
 
             <Modal
                 open={openView}
@@ -184,6 +234,68 @@ const RunSheet = () => {
 
                     </div>
 
+                )}
+            </Modal>
+            {/* Modal pour RetourD */}
+            <Modal
+                open={openRetourD}
+                onCancel={() => setOpenRetourD(false)}
+                footer={[
+                    <Button key="back" onClick={() => setOpenRetourD(false)}>
+                        Annuler
+                    </Button>,
+                    <Button key="submit" type="primary" onClick={() => handleUpdateStatus("RetourD")}>
+                        Confirmer
+                    </Button>
+                ]}
+            >
+                {selectedRunSheet && (
+                    <div>
+                        <h3>Changer le statut des livraisons pour {selectedRunSheet.code}</h3>
+                        <Select
+                            mode="multiple" // Permettre la sélection multiple
+                            placeholder="Sélectionnez les livraisons"
+                            style={{ width: '100%' }}
+                            onChange={(values) => setSelectedLivraisons(values)} // Stocker les livraisons sélectionnées
+                        >
+                            {selectedRunSheet.livraisons.map((livraison, index) => (
+                                <Option key={index} value={livraison}>
+                                    {livraison}
+                                </Option>
+                            ))}
+                        </Select>
+                    </div>
+                )}
+            </Modal>
+            {/* Modal pour Valider */}
+            <Modal
+                open={openLivré}
+                onCancel={() => setOpenLivré(false)}
+                footer={[
+                    <Button key="back" onClick={() => setOpenLivré(false)}>
+                        Annuler
+                    </Button>,
+                    <Button key="submit" type="primary" onClick={() => handleUpdateStatus("Livré")}>
+                        Confirmer
+                    </Button>
+                ]}
+            >
+                {selectedRunSheet && (
+                    <div>
+                        <h3>Changer le statut des livraisons pour {selectedRunSheet.code}</h3>
+                        <Select
+                            mode="multiple" // Permettre la sélection multiple
+                            placeholder="Sélectionnez les livraisons"
+                            style={{ width: '100%' }}
+                            onChange={(values) => setSelectedLivraisons(values)} // Stocker les livraisons sélectionnées
+                        >
+                            {selectedRunSheet.livraisons.map((livraison, index) => (
+                                <Option key={index} value={livraison}>
+                                    {livraison}
+                                </Option>
+                            ))}
+                        </Select>
+                    </div>
                 )}
             </Modal>
         </div>

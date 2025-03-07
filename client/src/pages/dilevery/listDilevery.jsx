@@ -140,7 +140,13 @@ const Delivery = () => {
             case 'EnCours':
                 color = 'green';
                 break;
-            case 'Livree':
+            case 'RetourE':
+                color = 'red';
+                break;
+            case 'RetourD':
+                color = 'cyan';
+                break;
+            case 'Livré':
                 color = 'purple';
                 break;
             default:
@@ -284,6 +290,7 @@ const Delivery = () => {
                 columns={columns}
                 rowKey="_id"
                 loading={isLoading}
+                pagination={{ pageSize: 5 }}
             />
 
             <AddDilevery open={open} setOpen={setOpen} />

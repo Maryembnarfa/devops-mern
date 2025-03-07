@@ -8,6 +8,9 @@ const RunSheetModel = new Schema(
             ref: "users",
             required: true, // Champ obligatoire
         },
+        code: {
+            type: String,
+        },
         serie: {
             type: String,
             required: true, // Ajouté comme obligatoire
