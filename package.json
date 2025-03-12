@@ -1,5 +1,8 @@
 {
   "dependencies": {
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.1.9",
+    "redux": "^5.0.1",
+    "@redux-devtools/extension": "^1.0.1"
   }
 }
+

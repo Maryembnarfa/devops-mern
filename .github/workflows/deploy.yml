@@ -1,0 +1,36 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main  # Déclenchement du pipeline sur un push dans "main"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 🔄 Checkout du code
+      uses: actions/checkout@v3
+
+    - name: 🔥 Connexion à Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    - name: 📦 Build et push des images Docker
+      run: |
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/livraison-frontend ./client
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/livraison-backend ./server
+        docker push ${{ secrets.DOCKER_USERNAME }}/livraison-frontend
+        docker push ${{ secrets.DOCKER_USERNAME }}/livraison-backend
+
+    - name: 🚀 Déploiement sur le serveur
+      uses: appleboy/ssh-action@v0.1.10
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        password: ${{ secrets.SERVER_PASSWORD }}
+        script: |
+          docker pull ${{ secrets.DOCKER_USERNAME }}/livraison-frontend
+          docker pull ${{ secrets.DOCKER_USERNAME }}/livraison-backend
+          docker-compose down
+          docker-compose up -d

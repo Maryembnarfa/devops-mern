@@ -1,18 +1,21 @@
-# Utilisation de l'image officielle Node.js
-FROM node:18
-
-# Définir le répertoire de travail
+FROM node:16
 WORKDIR /app
 
-# Copier package.json et installer les dépendances
-COPY package.json ./
+# Copier package.json et package-lock.json
+COPY package*.json ./
+RUN ls -la # Affiche les fichiers après la copie de package.json
+
+
+# Copier le reste des fichiers
+COPY . .
+RUN ls -la # Affiche les fichiers après la copie de tous les fichiers
+
+# Installer les dépendances
 RUN npm install --legacy-peer-deps
 
-# Copier le reste des fichiers du projet
-COPY . .
 
 # Construire l'application React
 RUN npm run build
 
-# Servir l'application avec un serveur léger (nginx ou serve)
+# Servir l'application avec un serveur léger
 CMD ["npx", "serve", "-s", "build", "-l", "3000"]
