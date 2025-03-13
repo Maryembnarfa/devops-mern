@@ -18,5 +18,6 @@ jobs:
 
       - name: Build et push de l’image Docker
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/mon-image:latest .
-          docker push ${{ secrets.DOCKER_USERNAME }}/mon-image:latest
+         docker build -t ${{ secrets.DOCKER_USERNAME }}/mon-image:latest .
+         docker push ${{ secrets.DOCKER_USERNAME }}/mon-image:latest
+
