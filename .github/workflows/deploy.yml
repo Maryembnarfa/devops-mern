@@ -1,23 +1,40 @@
-name: build-and-deploy
+name: Deploy to Server
 
 on:
   push:
     branches:
-      - main
+      - main  # Déclenchement du pipeline sur un push dans "main"
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Exécution sur une machine virtuelle Ubuntu
 
     steps:
-      - name: Checkout du code
-        uses: actions/checkout@v3
+      # Étape 1 : Checkout du code
+      - name: 🔄 Checkout du code
+        uses: actions/checkout@v3  # Télécharge le code de ton dépôt
 
+      # Étape 2 : Connexion à Docker Hub
       - name: Connexion à Docker Hub
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+        run: echo "Maryem123123." | docker login -u "maryembn14" --password-stdin
 
-      - name: Build et push de l’image Docker
+      # Étape 3 : Build et push des images Docker
+      - name: 📦 Build et push des images Docker
         run: |
-         docker build -t ${{ secrets.DOCKER_USERNAME }}/mon-image:latest .
-         docker push ${{ secrets.DOCKER_USERNAME }}/mon-image:latest
+          docker build -t maryembn14/livraison-frontend ./client  # Construit l'image frontend
+          docker build -t maryembn14/livraison-backend ./server   # Construit l'image backend
+          docker push maryembn14/livraison-frontend  # Pousse l'image frontend sur Docker Hub
+          docker push maryembn14/livraison-backend   # Pousse l'image backend sur Docker Hub
 
+      # Étape 4 : Déploiement sur le serveur (commentée pour l'instant)
+      # - name: 🚀 Déploiement sur le serveur
+      #   uses: appleboy/ssh-action@v0.1.10
+      #   with:
+      #     host: ${{ secrets.SERVER_HOST }}  # Adresse IP ou domaine du serveur
+      #     username: ${{ secrets.SERVER_USER }}  # Nom d'utilisateur SSH
+      #     password: ${{ secrets.SERVER_PASSWORD }}  # Mot de passe SSH
+      #     script: |
+      #       docker pull maryembn14/livraison-frontend  # Télécharge l'image frontend
+      #       docker pull maryembn14/livraison-backend   # Télécharge l'image backend
+      #       docker-compose down  # Arrête les conteneurs existants
+      #       docker-compose up -d  # Redémarre les conteneurs avec les nouvelles images
