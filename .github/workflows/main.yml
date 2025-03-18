@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  build:
+  build-client:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,22 +16,50 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
-      - name: Install Docker Compose
-        run: |
-          sudo curl -L "https://github.com/docker/compose/releases/download/v2.18.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-          sudo chmod +x /usr/local/bin/docker-compose
-
-      - name: Build Docker images
+      - name: Build Client Docker image
         run: |
           set -e  # Fail the script if any command fails
-
-          # Build the client Docker image
           cd client/
           docker build -t ${{ secrets.DOCKER_USERNAME }}/client:latest .
 
-          # Build the server Docker image
-          cd ../server/
+      - name: Save Client Docker image as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: client-image
+          path: client/
+
+  build-server:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build Server Docker image
+        run: |
+          set -e  # Fail the script if any command fails
+          cd server/
           docker build -t ${{ secrets.DOCKER_USERNAME }}/server:latest .
+
+      - name: Save Server Docker image as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: server-image
+          path: server/
+
+  deploy-client:
+    runs-on: ubuntu-latest
+    needs: build-client
+
+    steps:
+      - name: Download Client Docker image artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: client-image
+          path: client/
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
@@ -39,12 +67,29 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Push Docker images
+      - name: Push Client Docker image
         run: |
           set -e  # Fail the script if any command fails
-
-          # Push the client Docker image
           docker push ${{ secrets.DOCKER_USERNAME }}/client:latest
 
-          # Push the server Docker image
+  deploy-server:
+    runs-on: ubuntu-latest
+    needs: build-server
+
+    steps:
+      - name: Download Server Docker image artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: server-image
+          path: server/
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push Server Docker image
+        run: |
+          set -e  # Fail the script if any command fails
           docker push ${{ secrets.DOCKER_USERNAME }}/server:latest
