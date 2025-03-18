@@ -52,7 +52,7 @@ jobs:
 
   deploy-client:
     runs-on: ubuntu-latest
-    needs: build-client
+    needs: [build-client]  # Wait for both build jobs
 
     steps:
       - name: Download Client Docker image artifact
@@ -74,7 +74,7 @@ jobs:
 
   deploy-server:
     runs-on: ubuntu-latest
-    needs: build-server
+    needs: [build-server]  # Wait for both build jobs
 
     steps:
       - name: Download Server Docker image artifact
