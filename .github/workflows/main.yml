@@ -49,5 +49,3 @@ jobs:
           # Push the server Docker image
           docker push ${{ secrets.DOCKER_USERNAME }}/server:latest
 
-
-divide it into build-client and build-server and depliy-client deploy-server jobs
