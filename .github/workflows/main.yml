@@ -1,0 +1,50 @@
+name: Github CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Install Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/v2.18.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+
+      - name: Build Docker images
+        run: |
+          set -e  # Fail the script if any command fails
+
+          # Build the client Docker image
+          cd client/
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/client:latest .
+
+          # Build the server Docker image
+          cd ../server/
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/server:latest .
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push Docker images
+        run: |
+          set -e  # Fail the script if any command fails
+
+          # Push the client Docker image
+          docker push ${{ secrets.DOCKER_USERNAME }}/client:latest
+
+          # Push the server Docker image
+          docker push ${{ secrets.DOCKER_USERNAME }}/server:latest
