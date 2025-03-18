@@ -52,7 +52,7 @@ jobs:
 
   deploy-client:
     runs-on: ubuntu-latest
-    needs: [build-client]  # Wait for both build jobs
+    needs: [build-client]  # Wait for the build-client job
 
     steps:
       - name: Download Client Docker image artifact
@@ -74,7 +74,7 @@ jobs:
 
   deploy-server:
     runs-on: ubuntu-latest
-    needs: [build-server]  # Wait for both build jobs
+    needs: [build-server]  # Wait for the build-server job
 
     steps:
       - name: Download Server Docker image artifact
@@ -93,5 +93,3 @@ jobs:
         run: |
           set -e  # Fail the script if any command fails
           docker push ${{ secrets.DOCKER_USERNAME }}/server:latest
-
-
